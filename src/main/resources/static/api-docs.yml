@@ -3,298 +3,147 @@ info:
   title: Rest API Application
   version: 1.0.0
 servers:
-  - url: http://localhost:8082
+  - url: http://localhost:8080
 tags:
-  - name: 'users'
+  - name: 'user'
     description: 'Everything about users'
-  - name: 'auth'
+  - name: 'car'
     description: 'authentication'
 paths:
-  /users:
+  /api/v1/user:
     get:
-      summary: 'Get all users'
-      operationId: findAll
-      security:
-        - bearerAuth: [ ]
+      summary: find users by params
+      operationId: findUsers
       tags:
-        - 'users'
+        - 'user'
       parameters:
         - in: query
-          name: age
+          name: request
           allowEmptyValue: true
           schema:
-            type: integer
-            description: 'Age of user'
-            minimum: 0
-        - in: query
-          name: phone
-          schema:
-            type: string
-            description: 'Phone of user'
-            minLength: 5
-        - in: query
-          name: name
-          schema:
-            type: string
-            description: 'Name of user'
-            minLength: 1
-        - in: query
-          name: email
-          schema:
-            type: string
-            description: 'Email of user'
-            minLength: 5
-        - in: query
-          name: page
-          schema:
-            type: integer
-            description: 'Number of page'
-            minimum: 0
-        - in: query
-          name: size
-          schema:
-            type: integer
-            description: 'Pages size'
-            minimum: 0
+            $ref: '#/components/schemas/FindUsersRequest'
       responses:
         '200':
-          description: 'Found users'
+          description: 'All found users'
           content:
-            application/json:
+            'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserFullResponse'
+                  $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: 'Not found'
     post:
       summary: 'Create new user'
       operationId: createUser
-      security:
-        - bearerAuth: [ ]
       tags:
-        - 'users'
+        - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UserRequest'
-        required: true
       responses:
         '201':
-          description: 'New user is created'
-        '400':
-          description: 'Wrong request format'
+          description: 'Created user'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationErrorResponse'
-    patch:
-      summary: 'Update user email'
-      operationId: updateUserEmail
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - 'users'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangeEmailRequest'
-        required: true
-      responses:
-        '200':
-          description: 'User email was updated'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserFullResponse'
-        '400':
-          description: 'Wrong request format'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorResponse'
-
-  /users/{id}:
+                $ref: '#/components/schemas/UserResponse'
+  /api/v1/user/{id}:
     get:
-      summary: 'Get a user by id'
-      operationId: findById
-      security:
-        - bearerAuth: [ ]
+      summary: get User
+      operationId: getUserById
       tags:
-        - 'users'
+        - user
       parameters:
         - in: path
           name: id
+          required: true
           schema:
             type: integer
             format: int64
-            minimum: 0
-          required: true
-          description: 'Numeric ID of the user to get'
       responses:
-        '200':
-          description: 'User for requested ID'
+        200:
+          description: Found user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserFullResponse'
-        '404':
-          description: 'Requested data not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    delete:
-      summary: 'Delete user by id'
-      operationId: 'deleteUser'
-      security:
-        - bearerAuth: [ ]
+                $ref: '#/components/schemas/UserResponse'
+  /api/v1/car:
+    get:
+      description: 'Find cars'
       tags:
-        - 'users'
+        - car
       parameters:
-        - in: path
-          name: id
+        - in: query
+          name: request
+          description: request params for find cars
+          allowEmptyValue: true
           schema:
-            type: integer
-            format: int64
-            minimum: 0
-          required: true
-          description: 'Numeric ID of the user to delete'
-      responses:
-        '204':
-          description: 'User for requested ID is removed'
-
-  /auth/v1/login:
-    post:
-      summary: 'User authentication'
-      operationId: auth
-      tags:
-        - 'auth'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthenticationRequestDto'
-        required: true
+            $ref: '#/components/schemas/CarFindRequest'
       responses:
         '200':
-          description: 'User authentication successful'
+          description: 'Found cars'
           content:
-            application/json:
+            'application/json':
               schema:
-                $ref: '#/components/schemas/AccessDto'
-
-  /auth/v1/register:
-    post:
-      summary: 'Creating new user'
-      operationId: registerNewUser
-      tags:
-        - 'auth'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserRequest'
-        required: true
-      responses:
-        '201':
-          description: 'New user is created'
-        '400':
-          description: 'Wrong request format'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/CarResponse'
 
 components:
   schemas:
-    AuthenticationRequestDto:
+    FindUsersRequest:
       type: object
-      description: 'Request for user auth'
-      required:
-        - username
-        - password
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-
-    AccessDto:
-      type: object
-      description: 'Bearer token for work'
-      required:
-        - username
-        - token
-      properties:
-        username:
-          type: string
-        token:
-          type: string
-
-    ErrorDescription:
-      type: object
-      description: 'Error description'
-      properties:
-        field:
-          type: string
-        error:
-          type: string
-
-    ErrorResponse:
-      type: object
-      description: 'Error response'
-      properties:
-        message:
-          type: string
-
-    PhoneDto:
-      type: object
-      description: 'Phone number'
-      required:
-        - value
-      properties:
-        value:
-          type: string
-          minLength: 1
-        id:
-          type: integer
-          format: int64
-
-    ProfileDto:
-      type: object
-      description: 'User profile'
-      required:
-        - cash
-      properties:
-        cash:
-          type: number
-        id:
-          type: integer
-          format: int64
-
-    UserFullResponse:
-      type: object
-      description: 'Full user details'
+      description: params for find users
       properties:
         id:
           type: integer
           format: int64
         name:
           type: string
-        age:
+        phone:
+          type: string
+          pattern: '^((7)+([0-9]){10})$'
+    UserResponse:
+      type: object
+      description: 'User'
+      properties:
+        id:
           type: integer
-        email:
+          format: int64
+        name:
           type: string
-        username:
+    UserRequest:
+      type: object
+      description: 'User request'
+      properties:
+        firstName:
           type: string
-        phones:
-          type: array
-          items:
-            $ref: "#/components/schemas/PhoneDto"
-        profile:
-          $ref: "#/components/schemas/ProfileDto"
-
+        lastName:
+          type: string
+        phone:
+          type: string
+          maxLength: 11
+          minLength: 11
+          example: 79991232112
+          pattern: '^((7)+([0-9]){10})$'
+    CarFindRequest:
+      type: object
+      description: 'Car find request'
+      properties:
+        id:
+          type: integer
+          format: int64
+        model:
+          type: string
+    CarResponse:
+      type: object
+      description: 'Car'
+      properties:
+        model:
+          type: string
     ValidationErrorResponse:
       allOf:
         - $ref: "#/components/schemas/ErrorResponse"
@@ -304,49 +153,17 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/ErrorDescription"
-
-    UserRequest:
+    ErrorResponse:
       type: object
-      description: 'Request for create new user'
-      required:
-        - name
-        - email
-        - username
-        - password
+      description: 'Error response'
       properties:
-        name:
+        message:
           type: string
-        email:
-          type: string
-        age:
-          type: integer
-          minimum: 12
-          maximum: 85
-        username:
-          type: string
-        password:
-          type: string
-        profile:
-          $ref: "#/components/schemas/ProfileDto"
-        phones:
-          type: array
-          items:
-            $ref: "#/components/schemas/PhoneDto"
-
-    ChangeEmailRequest:
+    ErrorDescription:
       type: object
-      description: 'Request for change user email'
-      required:
-        - email
+      description: 'Error description'
       properties:
-        email:
+        field:
           type: string
-
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-security:
-  - bearerAuth: [ ]
+        error:
+          type: string
