@@ -8,7 +8,7 @@ tags:
   - name: 'user'
     description: 'Everything about users'
   - name: 'car'
-    description: 'authentication'
+    description: 'car'
 paths:
   /api/v1/user:
     get:
@@ -73,6 +73,7 @@ paths:
   /api/v1/car:
     get:
       description: 'Find cars'
+      operationId: findCars
       tags:
         - car
       parameters:
