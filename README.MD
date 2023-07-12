@@ -8,4 +8,4 @@
 4. Добавляем необходимые зависимости в проект.  (springdoc-openapi-ui, jackson-databind-nullable,
    spring-boot-starter-validation)
 5. Генерим код с помощью openapi-generator-maven-plugin плагина.
-6. Реализуем сгенерированные API.
+6. Реализуем сгенерированные API
